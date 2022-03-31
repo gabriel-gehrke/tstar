@@ -24,17 +24,19 @@ program_t* parse_program(FILE* stream)
         char c;
         do
         {
+            // read next character in stream, skip if whitespace
             c = fgetc(stream);
-            buff[i++] = c;
-            //putc(c, stdout);
-            putc((c != '\n' && i < MAX_LINE_LENGTH) + '0', stdout);
-            putc('\n', stdout);
-        } while (!feof(stream) && c != '\n' && i < MAX_LINE_LENGTH);
+            if (c != ' ' && c != '\t' && c != EOF)
+            {
+                buff[i++] = c;
+            }
+        } while (c != EOF && c != '\n' && i < MAX_LINE_LENGTH);
 
         if (i == MAX_LINE_LENGTH)
         {
             THROW("The maximum line length was breached");
         }
+        buff[i] = 0;
 
         if (!parse_line(buff, &p->operations[p->length++]))
         {
@@ -54,6 +56,9 @@ bool parse_line(const char* s, operation_t* out)
 
     char* token = strtok(buff, ",");
     if (!token) return false;
+    //printf("- %lu -\n", strlen(token));
+    puts(token);
+    if (strlen(token) != 5) return false;
 
     // get opcode
     {
@@ -65,9 +70,12 @@ bool parse_line(const char* s, operation_t* out)
     // get param
     {
         const char v[4] = {token[2], token[3], token[4], 0};
-        out->param = (ushort) strtoul(s, NULL, 10);
+        out->param = (ushort) strtoul(v, NULL, 10);
         if (out->param == 0 && strcmp(v, "000") != 0) return false;
     }
+
+    printf("opcode: %u\n", out->opcode);
+    printf("param : %u\n", out->param);
 
     return true;
 }

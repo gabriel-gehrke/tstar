@@ -13,5 +13,6 @@ typedef struct program
 program_t* program_allocate(uint num_operations);
 void program_free(program_t* p);
 void program_ensure_capacity(program_t* p, uint num_operations);
+void program_execute(program_t* p);
 
 #endif
